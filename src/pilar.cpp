@@ -23,10 +23,10 @@ static Block *runBlockAndProgress(Program &P, Memory &M, Block &B) {
   for (Instruction &I : B) {
     switch (I.Command) {
     case Commands::GOTO:
-      return findBlock(P, I.LBranch);
+      return findBlock(P, I.Operands[0]);
       break;
     case Commands::PUSH:
-      M.push(I.Constant);
+      M.push(stoi(I.Operands[0]));
       break;
     case Commands::PRINT:
       std::cout << M.top() << '\n';

@@ -8,9 +8,7 @@ enum class Commands { GOTO, CHOOSE, PUSH, PRINT };
 
 struct Instruction {
   Commands Command;
-  int Constant;
-  std::string LBranch;
-  std::string RBranch;
+  std::vector<std::string> Operands;
 };
 
 struct Symbol {};
