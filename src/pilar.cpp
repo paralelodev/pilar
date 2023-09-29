@@ -19,6 +19,30 @@ static Block *findBlock(Program &P, std::string_view Label) {
   return BI->second;
 }
 
+static int extractAndPopOne(Memory &M) {
+  if (M.size() < 1) {
+    exitError("stack memory does not have enough elements for a comparison");
+  }
+
+  int a = M.top();
+  M.pop();
+
+  return a;
+}
+
+static std::pair<int, int> extractAndPopTwo(Memory &M) {
+  if (M.size() < 2) {
+    exitError("stack memory does not have enough elements for a sum");
+  }
+
+  int b = M.top();
+  M.pop();
+  int a = M.top();
+  M.pop();
+
+  return {a, b};
+}
+
 static Block *runBlockAndProgress(Program &P, Memory &M, Dictionary &D,
                                   Block &B) {
   for (Instruction *I : B) {
@@ -47,18 +71,23 @@ static Block *runBlockAndProgress(Program &P, Memory &M, Dictionary &D,
       break;
     }
     case Commands::SUM: {
-      if (M.size() < 2) {
-        exitError("stack memory does not have enough elements for a sum");
-      }
-
-      int sum = 0;
-      for (int i = 0; i < 2; i++) {
-        sum += M.top();
-        M.pop();
-      }
-      M.push(sum);
+      auto [a, b] = extractAndPopTwo(M);
+      M.push(a + b);
       break;
     }
+    case Commands::EQUAL: {
+      auto [a, b] = extractAndPopTwo(M);
+      M.push(a == b ? 1 : 0);
+      break;
+    }
+    case Commands::GREATER: {
+      auto [a, b] = extractAndPopTwo(M);
+      M.push(a > b ? 1 : 0);
+      break;
+    }
+    case Commands::CHOOSE:
+      return findBlock(P, I->Operands[extractAndPopOne(M) == 1 ? 0 : 1]);
+      break;
     default:
       exitError("unsupported command");
       break;

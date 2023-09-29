@@ -11,3 +11,10 @@ target_link_libraries(test_002
   PRIVATE
   pilar
   )
+
+  add_executable(test_003 test_003.cpp)
+
+  target_link_libraries(test_003
+    PRIVATE
+    pilar
+    )

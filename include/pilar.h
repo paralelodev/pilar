@@ -4,7 +4,17 @@
 #include <vector>
 
 namespace pilar {
-enum class Commands { GOTO, CHOOSE, PUSH, PRINT, STORE, LOAD, SUM };
+enum class Commands {
+  GOTO,
+  CHOOSE,
+  PUSH,
+  PRINT,
+  STORE,
+  LOAD,
+  SUM,
+  EQUAL,
+  GREATER
+};
 
 struct Instruction {
   Commands Command;
