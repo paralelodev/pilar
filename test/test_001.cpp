@@ -17,14 +17,17 @@ int main() {
 
   Instruction I0 = {Commands::PUSH, {"1"}};
   Instruction I1 = {Commands::STORE, {"r0"}};
-  Instruction I2 = {Commands::LOAD, {"r1"}};
+  Instruction I2 = {Commands::LOAD, {"r0"}};
   Instruction I3 = {Commands::PRINT, {}};
   Instruction I4 = {Commands::GOTO, {".end"}};
   Instruction I5 = {Commands::PUSH, {"4"}};
   Instruction I6 = {Commands::PRINT, {}};
-  Block entry = {I0, I1, I2, I3, I4};
-  Block end = {I5, I6};
-  Program P = {{".entry", entry}, {".end", end}};
+  Block entry = {&I0, &I1, &I2, &I3, &I4};
+  Block end = {&I5, &I6};
+
+  Program P;
+  P[".entry"] = &entry;
+  P[".end"] = &end;
 
   runProgram(P);
 }

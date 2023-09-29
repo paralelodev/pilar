@@ -11,8 +11,8 @@ struct Instruction {
   std::vector<std::string> Operands;
 };
 
-using Block = std::vector<Instruction>;
-using Program = std::map<std::string, Block>;
+using Block = std::vector<Instruction *>;
+using Program = std::map<std::string, Block *>;
 using Dictionary = std::map<std::string, int>;
 using Memory = std::stack<int>;
 

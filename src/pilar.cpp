@@ -16,29 +16,29 @@ static Block *findBlock(Program &P, std::string_view Label) {
     exitError(error);
   }
 
-  return &(BI->second);
+  return BI->second;
 }
 
 static Block *runBlockAndProgress(Program &P, Memory &M, Dictionary &D,
                                   Block &B) {
-  for (Instruction &I : B) {
-    switch (I.Command) {
+  for (Instruction *I : B) {
+    switch (I->Command) {
     case Commands::GOTO:
-      return findBlock(P, I.Operands[0]);
+      return findBlock(P, I->Operands[0]);
       break;
     case Commands::PUSH:
-      M.push(stoi(I.Operands[0]));
+      M.push(stoi(I->Operands[0]));
       break;
     case Commands::PRINT:
       std::cout << M.top() << '\n';
       M.pop();
       break;
     case Commands::STORE:
-      D[I.Operands[0]] = M.top();
+      D[I->Operands[0]] = M.top();
       M.pop();
       break;
     case Commands::LOAD: {
-      Dictionary::iterator DI = D.find(I.Operands[0]);
+      Dictionary::iterator DI = D.find(I->Operands[0]);
       if (DI == D.end()) {
         exitError("value to load does not exist");
       }
