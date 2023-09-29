@@ -46,6 +46,19 @@ static Block *runBlockAndProgress(Program &P, Memory &M, Dictionary &D,
       M.push(value);
       break;
     }
+    case Commands::SUM: {
+      if (M.size() < 2) {
+        exitError("stack memory does not have enough elements for a sum");
+      }
+
+      int sum = 0;
+      for (int i = 0; i < 2; i++) {
+        sum += M.top();
+        M.pop();
+      }
+      M.push(sum);
+      break;
+    }
     default:
       exitError("unsupported command");
       break;
