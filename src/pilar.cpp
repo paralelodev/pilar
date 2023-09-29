@@ -19,7 +19,8 @@ static Block *findBlock(Program &P, std::string_view Label) {
   return &(BI->second);
 }
 
-static Block *runBlockAndProgress(Program &P, Memory &M, Block &B) {
+static Block *runBlockAndProgress(Program &P, Memory &M, Dictionary &D,
+                                  Block &B) {
   for (Instruction &I : B) {
     switch (I.Command) {
     case Commands::GOTO:
@@ -32,6 +33,19 @@ static Block *runBlockAndProgress(Program &P, Memory &M, Block &B) {
       std::cout << M.top() << '\n';
       M.pop();
       break;
+    case Commands::STORE:
+      D[I.Operands[0]] = M.top();
+      M.pop();
+      break;
+    case Commands::LOAD: {
+      Dictionary::iterator DI = D.find(I.Operands[0]);
+      if (DI == D.end()) {
+        exitError("value to load does not exist");
+      }
+      auto [id, value] = *DI;
+      M.push(value);
+      break;
+    }
     default:
       exitError("unsupported command");
       break;
@@ -42,6 +56,7 @@ static Block *runBlockAndProgress(Program &P, Memory &M, Block &B) {
 
 void runProgram(Program &P) {
   Memory M;
+  Dictionary D;
   std::string entry(".entry");
   Block *currentBlock = findBlock(P, entry);
   if (!currentBlock) {
@@ -49,7 +64,7 @@ void runProgram(Program &P) {
   }
 
   do {
-    currentBlock = runBlockAndProgress(P, M, *currentBlock);
+    currentBlock = runBlockAndProgress(P, M, D, *currentBlock);
   } while (currentBlock);
 }
 } // namespace pilar
