@@ -23,14 +23,15 @@ int main() {
   Instruction I0 = {Commands::PUSH, {"5"}};
   Instruction I1 = {Commands::STORE, {"r0"}};
   Instruction I2 = {Commands::LOAD, {"r0"}};
-  Instruction I3 = {Commands::PRINT, {}};
-  Instruction I4 = {Commands::PUSH, {"4"}};
-  Instruction I5 = {Commands::SUM, {}};
-  Instruction I6 = {Commands::STORE, {"r1"}};
-  Instruction I7 = {Commands::LOAD, {"r1"}};
-  Instruction I8 = {Commands::PRINT, {}};
+  Instruction I3 = {Commands::PUSH, {"4"}};
+  Instruction I4 = {Commands::SUM, {}};
+  Instruction I5 = {Commands::STORE, {"r1"}};
+  Instruction I6 = {Commands::LOAD, {"r0"}};
+  Instruction I7 = {Commands::PRINT, {}};
+  Instruction I8 = {Commands::LOAD, {"r1"}};
+  Instruction I9 = {Commands::PRINT, {}};
 
-  Block entry = {&I0, &I1, &I2, &I3, &I4, &I5, &I6, &I7, &I8};
+  Block entry = {&I0, &I1, &I2, &I3, &I4, &I5, &I6, &I7, &I8, &I9};
 
   Program P;
   P[".entry"] = &entry;
