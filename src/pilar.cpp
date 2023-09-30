@@ -3,8 +3,16 @@
 #include <string_view>
 
 namespace pilar {
+static void resetMemory(IntStack M) {
+  while (!M.empty()) {
+    M.pop();
+  }
+}
+
 static void exitError(Program &P, std::string_view error) {
   std::cout << "Error: " << error << '\n';
+  resetMemory(P.Memory);
+  P.Dictionary.clear();
   exit(0);
 }
 
@@ -47,6 +55,7 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
   for (Instruction *I : B) {
     switch (I->Command) {
     case Commands::GOTO:
+      resetMemory(P.Memory);
       return findBlock(P, I->Operands[0]);
       break;
     case Commands::PUSH:
@@ -84,9 +93,12 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
       P.Memory.push(a > b ? 1 : 0);
       break;
     }
-    case Commands::CHOOSE:
-      return findBlock(P, I->Operands[extractAndPopOne(P) == 1 ? 0 : 1]);
+    case Commands::CHOOSE: {
+      int a = extractAndPopOne(P);
+      resetMemory(P.Memory);
+      return findBlock(P, I->Operands[a == 1 ? 0 : 1]);
       break;
+    }
     default:
       exitError(P, "unsupported command");
       break;
