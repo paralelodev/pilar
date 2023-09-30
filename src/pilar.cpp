@@ -1,6 +1,5 @@
 #include "pilar.h"
 #include <iostream>
-#include <string_view>
 
 namespace pilar {
 static void resetMemory(IntStack M) {
@@ -45,6 +44,19 @@ static std::pair<int, int> extractAndPopTwo(Program &P) {
   return {a, b};
 }
 
+static void eraseScopeSymbols(SymbolMap &Dictionary, int scope) {
+  std::vector<std::string_view> keysToDelete;
+  for (auto [key, symbol] : Dictionary) {
+    if (symbol.Scope == scope) {
+      keysToDelete.push_back(key);
+    }
+  }
+
+  for (std::string_view key : keysToDelete) {
+    Dictionary.erase(key.data());
+  }
+}
+
 static Block *runBlockAndProgress(Program &P, Block &B) {
   if (!B.empty() && B.back()->Command != Commands::GOTO &&
       B.back()->Command != Commands::CHOOSE) {
@@ -53,28 +65,34 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
 
   for (Instruction *I : B) {
     switch (I->Command) {
-    case Commands::GOTO:
+    case Commands::GOTO: {
       resetMemory(P.Memory);
-      return findBlock(P.Blocks, I->Operands[0]);
+      std::string_view targetBlock = I->Operands[0];
+      if (P.CurrentScope == 0 && targetBlock != ".exit") {
+        exitError(P, "blocks do not diverge");
+      }
+      eraseScopeSymbols(P.Dictionary, P.CurrentScope);
+      P.CurrentScope--;
+      return findBlock(P.Blocks, targetBlock);
       break;
+    }
     case Commands::PUSH:
-      P.Memory.push(stoi(I->Operands[0]));
+      P.Memory.push(atoi(I->Operands[0].data()));
       break;
     case Commands::PRINT:
       std::cout << P.Memory.top() << '\n';
       P.Memory.pop();
       break;
     case Commands::STORE:
-      P.Dictionary[I->Operands[0]] = P.Memory.top();
+      P.Dictionary[I->Operands[0]] = {P.Memory.top(), P.CurrentScope};
       P.Memory.pop();
       break;
     case Commands::LOAD: {
-      IntMap::iterator DI = P.Dictionary.find(I->Operands[0]);
+      SymbolMap::iterator DI = P.Dictionary.find(I->Operands[0]);
       if (DI == P.Dictionary.end()) {
-        exitError(P, "value to load does not exist");
+        exitError(P, "value to load does not exist in this scope");
       }
-      auto [id, value] = *DI;
-      P.Memory.push(value);
+      P.Memory.push(DI->second.Value);
       break;
     }
     case Commands::SUM: {
@@ -95,7 +113,13 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
     case Commands::CHOOSE: {
       int a = extractAndPopOne(P);
       resetMemory(P.Memory);
-      return findBlock(P.Blocks, I->Operands[a == 1 ? 0 : 1]);
+      int index = 1;
+      if (a == 1) {
+        P.CurrentScope++;
+        index = 0;
+      }
+
+      return findBlock(P.Blocks, I->Operands[index]);
       break;
     }
     default:
