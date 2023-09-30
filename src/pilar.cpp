@@ -16,15 +16,9 @@ static void exitError(Program &P, std::string_view error) {
   exit(0);
 }
 
-static Block *findBlock(Program &P, std::string_view Label) {
-  BlockMap::iterator BI = P.Blocks.find(Label.data());
-  std::string error("program has no block with label ");
-  error.append(Label);
-  if (BI == P.Blocks.end()) {
-    exitError(P, error);
-  }
-
-  return BI->second;
+static Block *findBlock(BlockMap &Blocks, std::string_view Label) {
+  BlockMap::iterator BI = Blocks.find(Label.data());
+  return BI == Blocks.end() ? nullptr : BI->second;
 }
 
 static int extractAndPopOne(Program &P) {
@@ -52,11 +46,16 @@ static std::pair<int, int> extractAndPopTwo(Program &P) {
 }
 
 static Block *runBlockAndProgress(Program &P, Block &B) {
+  if (!B.empty() && B.back()->Command != Commands::GOTO &&
+      B.back()->Command != Commands::CHOOSE) {
+    exitError(P, "final instruction of block is not a branching instruction");
+  }
+
   for (Instruction *I : B) {
     switch (I->Command) {
     case Commands::GOTO:
       resetMemory(P.Memory);
-      return findBlock(P, I->Operands[0]);
+      return findBlock(P.Blocks, I->Operands[0]);
       break;
     case Commands::PUSH:
       P.Memory.push(stoi(I->Operands[0]));
@@ -96,7 +95,7 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
     case Commands::CHOOSE: {
       int a = extractAndPopOne(P);
       resetMemory(P.Memory);
-      return findBlock(P, I->Operands[a == 1 ? 0 : 1]);
+      return findBlock(P.Blocks, I->Operands[a == 1 ? 0 : 1]);
       break;
     }
     default:
@@ -108,10 +107,13 @@ static Block *runBlockAndProgress(Program &P, Block &B) {
 }
 
 void runProgram(Program &P) {
-  std::string entry(".entry");
-  Block *currentBlock = findBlock(P, entry);
+  Block *currentBlock = findBlock(P.Blocks, ".entry");
   if (!currentBlock) {
-    exitError(P, "program does not have an entry point");
+    exitError(P, "program does not have an entry block");
+  }
+
+  if (!findBlock(P.Blocks, ".exit")) {
+    exitError(P, "program does not have an exit block");
   }
 
   do {

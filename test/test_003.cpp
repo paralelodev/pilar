@@ -45,6 +45,9 @@ int main() {
   // load r1
   // +
   // print
+  // goto .exit
+  //
+  // .exit
 
   Instruction I0 = {Commands::PUSH, {"1"}};
   Instruction I1 = {Commands::STORE, {"r0"}};
@@ -72,12 +75,14 @@ int main() {
   Instruction N1 = {Commands::LOAD, {"r1"}};
   Instruction N2 = {Commands::SUM, {}};
   Instruction N3 = {Commands::PRINT, {}};
+  Instruction N4 = {Commands::GOTO, {".exit"}};
 
   Block entry = {&I0, &I1, &I2, &I3, &I4, &I5, &I6, &I7};
   Block tru = {&J0, &J1, &J2};
   Block cont = {&L0, &L1, &L2, &L3};
   Block tru1 = {&K0, &K1, &K2};
-  Block cont1 = {&N0, &N1, &N2, &N3};
+  Block cont1 = {&N0, &N1, &N2, &N3, &N4};
+  Block exit = {};
 
   Program P;
   P.Blocks[".entry"] = &entry;
@@ -85,6 +90,7 @@ int main() {
   P.Blocks[".true1"] = &tru1;
   P.Blocks[".continue"] = &cont;
   P.Blocks[".continue1"] = &cont1;
+  P.Blocks[".exit"] = &exit;
 
   runProgram(P);
 }
