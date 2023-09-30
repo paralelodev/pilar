@@ -22,9 +22,15 @@ struct Instruction {
 };
 
 using Block = std::vector<Instruction *>;
-using Program = std::map<std::string, Block *>;
-using Dictionary = std::map<std::string, int>;
-using Memory = std::stack<int>;
+using BlockMap = std::map<std::string, Block *>;
+using IntMap = std::map<std::string, int>;
+using IntStack = std::stack<int>;
+
+struct Program {
+  BlockMap Blocks;
+  IntMap Dictionary;
+  IntStack Memory;
+};
 
 void runProgram(Program &P);
 

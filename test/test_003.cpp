@@ -80,11 +80,11 @@ int main() {
   Block cont1 = {&N0, &N1, &N2, &N3};
 
   Program P;
-  P[".entry"] = &entry;
-  P[".true"] = &tru;
-  P[".true1"] = &tru1;
-  P[".continue"] = &cont;
-  P[".continue1"] = &cont1;
+  P.Blocks[".entry"] = &entry;
+  P.Blocks[".true"] = &tru;
+  P.Blocks[".true1"] = &tru1;
+  P.Blocks[".continue"] = &cont;
+  P.Blocks[".continue1"] = &cont1;
 
   runProgram(P);
 }

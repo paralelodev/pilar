@@ -26,8 +26,8 @@ int main() {
   Block end = {&I5, &I6};
 
   Program P;
-  P[".entry"] = &entry;
-  P[".end"] = &end;
+  P.Blocks[".entry"] = &entry;
+  P.Blocks[".end"] = &end;
 
   runProgram(P);
 }

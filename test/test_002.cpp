@@ -34,7 +34,7 @@ int main() {
   Block entry = {&I0, &I1, &I2, &I3, &I4, &I5, &I6, &I7, &I8, &I9};
 
   Program P;
-  P[".entry"] = &entry;
+  P.Blocks[".entry"] = &entry;
 
   runProgram(P);
 }
