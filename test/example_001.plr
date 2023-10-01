@@ -1,0 +1,10 @@
+.entry
+push 1
+store r0
+load r0
+print
+push 4
+print
+goto .exit
+
+.exit

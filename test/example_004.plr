@@ -1,0 +1,36 @@
+.entry
+push 1
+store r0
+push 1
+store r1
+load r0
+load r1
+==
+choose .true .continue
+
+.true
+push 9
+store r3
+load r3
+print
+goto .continue
+
+.continue
+load r0
+load r1
+==
+choose .true1 .continue1
+
+.true1
+load r0
+print
+goto .continue1
+
+.continue1
+load r0
+load r1
++
+print
+goto .exit
+
+.exit
