@@ -1,6 +1,6 @@
 #include <map>
 #include <stack>
-#include <string_view>
+#include <string>
 #include <vector>
 
 namespace pilar {
@@ -13,12 +13,13 @@ enum class Commands {
   LOAD,
   SUM,
   EQUAL,
-  GREATER
+  GREATER,
+  NONE
 };
 
 struct Instruction {
   Commands Command;
-  std::vector<std::string_view> Operands;
+  std::vector<std::string> Operands;
 };
 
 struct Symbol {
@@ -26,9 +27,9 @@ struct Symbol {
   int Scope;
 };
 
-using Block = std::vector<Instruction *>;
-using BlockMap = std::map<std::string_view, Block *>;
-using SymbolMap = std::map<std::string_view, Symbol>;
+using Block = std::vector<Instruction>;
+using BlockMap = std::map<std::string, Block>;
+using SymbolMap = std::map<std::string, Symbol>;
 using IntStack = std::stack<int>;
 
 struct Program {

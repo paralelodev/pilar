@@ -13,10 +13,11 @@ int main() {
   // push 5
   // store r0
   // load r0
-  // print
   // push 4
   // +
   // store r1
+  // load r0
+  // print
   // load r1
   // print
   // goto .exit
@@ -35,12 +36,12 @@ int main() {
   Instruction I9 = {Commands::PRINT, {}};
   Instruction I10 = {Commands::GOTO, {".exit"}};
 
-  Block entry = {&I0, &I1, &I2, &I3, &I4, &I5, &I6, &I7, &I8, &I9, &I10};
+  Block entry = {I0, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10};
   Block exit = {};
 
   Program P;
-  P.Blocks[".entry"] = &entry;
-  P.Blocks[".exit"] = &exit;
+  P.Blocks[".entry"] = entry;
+  P.Blocks[".exit"] = exit;
 
   runProgram(P);
 }
