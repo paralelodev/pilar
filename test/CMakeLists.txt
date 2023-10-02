@@ -25,3 +25,10 @@ target_link_libraries(test_004
   PRIVATE
   pilar
   )
+
+add_executable(dag_002 dag_002.cpp)
+
+target_link_libraries(dag_002
+  PRIVATE
+  dag
+  )
