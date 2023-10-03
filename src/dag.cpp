@@ -48,7 +48,7 @@ void Print::ToText(std::ostringstream &oss, StringMap &Dictionary,
                    unsigned int &ElseCounter, unsigned int &ContinueCounter) {
   Value->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
                 ContinueCounter);
-  oss << "print " << '\n';
+  oss << "print" << '\n';
 }
 
 void Block::ToText(std::ostringstream &oss, StringMap &Dictionary,
