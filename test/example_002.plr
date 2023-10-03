@@ -1,8 +1,8 @@
 .entry
 push 5
 store r0
-load r0
 push 4
+load r0
 +
 store r1
 load r0
