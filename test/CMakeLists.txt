@@ -32,3 +32,10 @@ target_link_libraries(dag_002
   PRIVATE
   dag
   )
+
+add_executable(dag_003 dag_003.cpp)
+
+target_link_libraries(dag_003
+  PRIVATE
+  dag
+  )

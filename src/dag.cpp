@@ -4,7 +4,7 @@
 namespace dag {
 
 static std::string getAlias(std::string_view Identifier, StringMap &Dictionary,
-                            unsigned int &Counter, bool isStore) {
+                            unsigned int &VariableCounter, bool isStore) {
   StringMap::iterator SI = Dictionary.find(Identifier.data());
   if (SI != Dictionary.end()) {
     return SI->second;
@@ -15,29 +15,128 @@ static std::string getAlias(std::string_view Identifier, StringMap &Dictionary,
     exit(0);
   }
 
-  std::string Alias = "r" + std::to_string(Counter);
-  Counter++;
+  std::string Alias = "r" + std::to_string(VariableCounter);
+  VariableCounter++;
   return Dictionary[Identifier.data()] = Alias;
 }
 
+void IntLiteral::ToText(std::ostringstream &oss, StringMap &Dictionary,
+                        unsigned int &VariableCounter,
+                        unsigned int &ThenCounter, unsigned int &ElseCounter,
+                        unsigned int &ContinueCounter) {
+  oss << "push " << Value << '\n';
+}
+
 void Assign::ToText(std::ostringstream &oss, StringMap &Dictionary,
-                    unsigned int &Counter) {
-  Value->ToText(oss, Dictionary, Counter);
-  oss << "store " << getAlias(Identifier, Dictionary, Counter, true) << '\n';
+                    unsigned int &VariableCounter, unsigned int &ThenCounter,
+                    unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+  Value->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                ContinueCounter);
+  oss << "store " << getAlias(Identifier, Dictionary, VariableCounter, true)
+      << '\n';
 };
 
 void Fetch::ToText(std::ostringstream &oss, StringMap &Dictionary,
-                   unsigned int &Counter) {
-  oss << "load " << getAlias(Identifier, Dictionary, Counter, false) << '\n';
+                   unsigned int &VariableCounter, unsigned int &ThenCounter,
+                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+  oss << "load " << getAlias(Identifier, Dictionary, VariableCounter, false)
+      << '\n';
 };
 
+void Print::ToText(std::ostringstream &oss, StringMap &Dictionary,
+                   unsigned int &VariableCounter, unsigned int &ThenCounter,
+                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+  Value->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                ContinueCounter);
+  oss << "print " << '\n';
+}
+
+void Block::ToText(std::ostringstream &oss, StringMap &Dictionary,
+                   unsigned int &VariableCounter, unsigned int &ThenCounter,
+                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+  for (Node *node : Instructions) {
+    node->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                 ContinueCounter);
+  }
+}
+
+void BinaryOperation::ToText(std::ostringstream &oss, StringMap &Dictionary,
+                             unsigned int &VariableCounter,
+                             unsigned int &ThenCounter,
+                             unsigned int &ElseCounter,
+                             unsigned int &ContinueCounter) {
+  RHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+              ContinueCounter);
+  LHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+              ContinueCounter);
+  switch (Op) {
+  case Operators::ADD:
+    oss << "+" << '\n';
+    break;
+  case Operators::EQUAL:
+    oss << "==" << '\n';
+    break;
+  case Operators::GREATER:
+    oss << ">" << '\n';
+    break;
+
+  default:
+
+    break;
+  }
+}
+
+void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
+                unsigned int &VariableCounter, unsigned int &ThenCounter,
+                unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+  BO->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+             ContinueCounter);
+
+  if (ThenPart->IsValid() && ElsePart->IsValid()) {
+    oss << "choose .then" << ThenCounter << " .else" << ElseCounter << '\n';
+  } else if (ThenPart->IsValid()) {
+    oss << "choose .then" << ThenCounter << " .continue" << ContinueCounter
+        << '\n';
+  } else {
+    std::cerr << "Error: then section is missing" << '\n';
+    exit(0);
+  }
+
+  if (ThenPart->IsValid()) {
+    oss << "\n.then" << std::to_string(ThenCounter) << '\n';
+    ThenPart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                     ContinueCounter);
+    oss << "goto "
+        << ".continue" << ContinueCounter << '\n';
+    ThenCounter++;
+  }
+
+  if (ElsePart->IsValid()) {
+    oss << "\n.else" << std::to_string(ElseCounter) << '\n';
+    ;
+    ElsePart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                     ContinueCounter);
+    oss << "goto "
+        << ".continue" << ContinueCounter;
+    ElseCounter++;
+  }
+
+  oss << "\n.continue" << std::to_string(ContinueCounter) << '\n';
+  ;
+  ContinueCounter++;
+}
+
 void DAG2Pilar(Block &DAG) {
-  unsigned int Counter = 0;
+  unsigned int VariableCounter = 0;
+  unsigned int ThenCounter = 0;
+  unsigned int ElseCounter = 0;
+  unsigned int ContinueCounter = 0;
   StringMap Dictionary;
   std::ostringstream PilarOutput;
   PilarOutput << ".entry" << '\n';
   for (Node *node : DAG.Instructions) {
-    node->ToText(PilarOutput, Dictionary, Counter);
+    node->ToText(PilarOutput, Dictionary, VariableCounter, ThenCounter,
+                 ElseCounter, ContinueCounter);
   }
   PilarOutput << "goto .exit" << '\n' << '\n' << ".exit" << '\n' << '\n';
   std::cout << PilarOutput.str();
