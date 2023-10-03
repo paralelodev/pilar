@@ -103,7 +103,7 @@ void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
   }
 
   if (ThenPart->IsValid()) {
-    oss << "\n.then" << std::to_string(ThenCounter) << '\n';
+    oss << "\n.then" << ThenCounter << '\n';
     ThenPart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
                      ContinueCounter);
     oss << "goto "
@@ -112,7 +112,7 @@ void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
   }
 
   if (ElsePart->IsValid()) {
-    oss << "\n.else" << std::to_string(ElseCounter) << '\n';
+    oss << "\n.else" << ElseCounter << '\n';
     ;
     ElsePart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
                      ContinueCounter);
@@ -121,7 +121,7 @@ void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
     ElseCounter++;
   }
 
-  oss << "\n.continue" << std::to_string(ContinueCounter) << '\n';
+  oss << "\n.continue" << ContinueCounter << '\n';
   ;
   ContinueCounter++;
 }
