@@ -65,9 +65,9 @@ void BinaryOperation::ToText(std::ostringstream &oss, StringMap &Dictionary,
                              unsigned int &ThenCounter,
                              unsigned int &ElseCounter,
                              unsigned int &ContinueCounter) {
-  RHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-              ContinueCounter);
   LHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+              ContinueCounter);
+  RHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
               ContinueCounter);
   switch (Op) {
   case Operators::ADD:
