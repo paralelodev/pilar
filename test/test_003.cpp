@@ -22,20 +22,20 @@ int main() {
   // load r0
   // load r1
   // ==
-  // choose .true .continue
+  // choose .then0 .continue0
   //
-  // .true
+  // .then0
   // push 0
   // print
-  // goto .continue
+  // goto .continue0
   //
-  // .continue
+  // .continue0
   // load r0
   // load r1
   // >
-  // choose .true1 .continue1
+  // choose .then1 .continue1
   //
-  // .true1
+  // .then1
   // push 1
   // print
   // goto .continue1
@@ -56,16 +56,16 @@ int main() {
   Instruction I4 = {Commands::LOAD, {"r0"}};
   Instruction I5 = {Commands::LOAD, {"r1"}};
   Instruction I6 = {Commands::EQUAL, {}};
-  Instruction I7 = {Commands::CHOOSE, {".true", ".continue"}};
+  Instruction I7 = {Commands::CHOOSE, {".then0", ".continue0"}};
 
   Instruction J0 = {Commands::PUSH, {"0"}};
   Instruction J1 = {Commands::PRINT, {}};
-  Instruction J2 = {Commands::GOTO, {".continue"}};
+  Instruction J2 = {Commands::GOTO, {".continue0"}};
 
   Instruction L0 = {Commands::LOAD, {"r0"}};
   Instruction L1 = {Commands::LOAD, {"r1"}};
   Instruction L2 = {Commands::GREATER, {}};
-  Instruction L3 = {Commands::CHOOSE, {".true1", ".continue1"}};
+  Instruction L3 = {Commands::CHOOSE, {".then1", ".continue1"}};
 
   Instruction K0 = {Commands::PUSH, {"1"}};
   Instruction K1 = {Commands::PRINT, {}};
@@ -86,9 +86,9 @@ int main() {
 
   Program P;
   P.Blocks[".entry"] = entry;
-  P.Blocks[".true"] = tru;
-  P.Blocks[".true1"] = tru1;
-  P.Blocks[".continue"] = cont;
+  P.Blocks[".then0"] = tru;
+  P.Blocks[".then1"] = tru1;
+  P.Blocks[".continue0"] = cont;
   P.Blocks[".continue1"] = cont1;
   P.Blocks[".exit"] = exit;
 

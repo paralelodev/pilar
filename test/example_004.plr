@@ -6,22 +6,22 @@ store r1
 load r0
 load r1
 ==
-choose .true .continue
+choose .then0 .continue0
 
-.true
+.then0
 push 9
 store r3
 load r3
 print
-goto .continue
+goto .continue0
 
-.continue
+.continue0
 load r0
 load r1
 ==
-choose .true1 .continue1
+choose .then1 .continue1
 
-.true1
+.then1
 load r0
 print
 goto .continue1
