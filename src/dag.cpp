@@ -138,7 +138,7 @@ void DAG2Pilar(Block &DAG) {
     node->ToText(PilarOutput, Dictionary, VariableCounter, ThenCounter,
                  ElseCounter, ContinueCounter);
   }
-  PilarOutput << "goto .exit" << '\n' << '\n' << ".exit" << '\n' << '\n';
+  PilarOutput << "goto .exit" << '\n' << '\n' << ".exit" << '\n';
   std::cout << PilarOutput.str();
 }
 } // namespace dag
