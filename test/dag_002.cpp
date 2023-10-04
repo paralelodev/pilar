@@ -3,21 +3,12 @@
 using namespace dag;
 
 int main() {
-  IntLiteral i0(5);
-  Assign a0("a", &i0);
+  Assign I0("a", IntLiteral(5));
+  Assign I1("b", BinaryOperation(Operators::ADD, IntLiteral(4), Fetch("a")));
+  Print I2(Fetch("a"));
+  Print I3(Fetch("b"));
 
-  IntLiteral i1(4);
-  Fetch f0("a");
-  BinaryOperation b0(Operators::ADD, &i1, &f0);
-  Assign a1("b", &b0);
-
-  Fetch f1("a");
-  Print p0(&f1);
-
-  Fetch f2("b");
-  Print p1(&f2);
-
-  Block DAG({&a0, &a1, &p0, &p1});
+  Block DAG({&I0, &I1, &I2, &I3});
 
   DAG2Pilar(DAG);
 }

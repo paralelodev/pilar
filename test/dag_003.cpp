@@ -3,34 +3,15 @@
 using namespace dag;
 
 int main() {
-  IntLiteral i0(1);
-  Assign a0("a", &i0);
+  Assign I0("a", IntLiteral(1));
+  Assign I1("b", IntLiteral(0));
+  If I2(BinaryOperation(Operators::EQUAL, Fetch("a"), Fetch("b")),
+        Print(IntLiteral(0)), Block({}));
+  If I3(BinaryOperation(Operators::GREATER, Fetch("a"), Fetch("b")),
+        Print(IntLiteral(1)), Block({}));
+  Print I4(BinaryOperation(Operators::ADD, Fetch("a"), Fetch("b")));
 
-  IntLiteral i1(0);
-  Assign a1("b", &i1);
-
-  Fetch f0("a");
-  Fetch f1("b");
-  BinaryOperation b0(Operators::EQUAL, &f0, &f1);
-  IntLiteral i2(0);
-  Print p0(&i2);
-  Block bl0({});
-  If if0(&b0, &p0, &bl0);
-
-  Fetch f2("a");
-  Fetch f3("b");
-  BinaryOperation b1(Operators::GREATER, &f2, &f3);
-  IntLiteral i3(1);
-  Print p1(&i3);
-  Block bl1({});
-  If if1(&b1, &p1, &bl1);
-
-  Fetch f4("a");
-  Fetch f5("b");
-  BinaryOperation b2(Operators::ADD, &f4, &f5);
-  Print p2(&b2);
-
-  Block DAG({&a0, &a1, &if0, &if1, &p2});
+  Block DAG({&I0, &I1, &I2, &I3, &I4});
 
   DAG2Pilar(DAG);
 }

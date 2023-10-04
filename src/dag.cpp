@@ -23,37 +23,41 @@ static std::string getAlias(std::string_view Identifier, StringMap &Dictionary,
 void IntLiteral::ToText(std::ostringstream &oss, StringMap &Dictionary,
                         unsigned int &VariableCounter,
                         unsigned int &ThenCounter, unsigned int &ElseCounter,
-                        unsigned int &ContinueCounter) {
+                        unsigned int &ContinueCounter) const {
   oss << "push " << Value << '\n';
 }
 
 void Assign::ToText(std::ostringstream &oss, StringMap &Dictionary,
                     unsigned int &VariableCounter, unsigned int &ThenCounter,
-                    unsigned int &ElseCounter, unsigned int &ContinueCounter) {
-  Value->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-                ContinueCounter);
+                    unsigned int &ElseCounter,
+                    unsigned int &ContinueCounter) const {
+  Value.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+               ContinueCounter);
   oss << "store " << getAlias(Identifier, Dictionary, VariableCounter, true)
       << '\n';
 };
 
 void Fetch::ToText(std::ostringstream &oss, StringMap &Dictionary,
                    unsigned int &VariableCounter, unsigned int &ThenCounter,
-                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+                   unsigned int &ElseCounter,
+                   unsigned int &ContinueCounter) const {
   oss << "load " << getAlias(Identifier, Dictionary, VariableCounter, false)
       << '\n';
 };
 
 void Print::ToText(std::ostringstream &oss, StringMap &Dictionary,
                    unsigned int &VariableCounter, unsigned int &ThenCounter,
-                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
-  Value->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-                ContinueCounter);
+                   unsigned int &ElseCounter,
+                   unsigned int &ContinueCounter) const {
+  Value.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+               ContinueCounter);
   oss << "print" << '\n';
 }
 
 void Block::ToText(std::ostringstream &oss, StringMap &Dictionary,
                    unsigned int &VariableCounter, unsigned int &ThenCounter,
-                   unsigned int &ElseCounter, unsigned int &ContinueCounter) {
+                   unsigned int &ElseCounter,
+                   unsigned int &ContinueCounter) const {
   for (Node *node : Instructions) {
     node->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
                  ContinueCounter);
@@ -64,11 +68,11 @@ void BinaryOperation::ToText(std::ostringstream &oss, StringMap &Dictionary,
                              unsigned int &VariableCounter,
                              unsigned int &ThenCounter,
                              unsigned int &ElseCounter,
-                             unsigned int &ContinueCounter) {
-  LHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-              ContinueCounter);
-  RHS->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-              ContinueCounter);
+                             unsigned int &ContinueCounter) const {
+  LHS.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+             ContinueCounter);
+  RHS.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+             ContinueCounter);
   switch (Op) {
   case Operators::ADD:
     oss << "+" << '\n';
@@ -88,13 +92,14 @@ void BinaryOperation::ToText(std::ostringstream &oss, StringMap &Dictionary,
 
 void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
                 unsigned int &VariableCounter, unsigned int &ThenCounter,
-                unsigned int &ElseCounter, unsigned int &ContinueCounter) {
-  BO->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-             ContinueCounter);
+                unsigned int &ElseCounter,
+                unsigned int &ContinueCounter) const {
+  BO.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+            ContinueCounter);
 
-  if (ThenPart->IsValid() && ElsePart->IsValid()) {
+  if (ThenPart.IsValid() && ElsePart.IsValid()) {
     oss << "choose .then" << ThenCounter << " .else" << ElseCounter << '\n';
-  } else if (ThenPart->IsValid()) {
+  } else if (ThenPart.IsValid()) {
     oss << "choose .then" << ThenCounter << " .continue" << ContinueCounter
         << '\n';
   } else {
@@ -102,27 +107,27 @@ void If::ToText(std::ostringstream &oss, StringMap &Dictionary,
     exit(0);
   }
 
-  if (ThenPart->IsValid()) {
+  if (ThenPart.IsValid()) {
     oss << "\n.then" << ThenCounter << '\n';
-    ThenPart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-                     ContinueCounter);
+    ThenPart.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                    ContinueCounter);
     oss << "goto "
         << ".continue" << ContinueCounter << '\n';
     ThenCounter++;
   }
 
-  if (ElsePart->IsValid()) {
+  if (ElsePart.IsValid()) {
     oss << "\n.else" << ElseCounter << '\n';
     ;
-    ElsePart->ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
-                     ContinueCounter);
+    ElsePart.ToText(oss, Dictionary, VariableCounter, ThenCounter, ElseCounter,
+                    ContinueCounter);
     oss << "goto "
         << ".continue" << ContinueCounter;
     ElseCounter++;
   }
 
   oss << "\n.continue" << ContinueCounter << '\n';
-  ;
+
   ContinueCounter++;
 }
 

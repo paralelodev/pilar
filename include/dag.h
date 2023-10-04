@@ -12,8 +12,8 @@ struct Node {
   virtual void ToText(std::ostringstream &oss, StringMap &Dictionary,
                       unsigned int &VariableCounter, unsigned int &ThenCounter,
                       unsigned int &ElseCounter,
-                      unsigned int &ContinueCounter) = 0;
-  virtual bool IsValid() = 0;
+                      unsigned int &ContinueCounter) const = 0;
+  virtual bool IsValid() const = 0;
 };
 
 struct Block : Node {
@@ -22,20 +22,20 @@ struct Block : Node {
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return !Instructions.empty(); }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return !Instructions.empty(); }
 };
 
 struct Assign : Node {
   std::string Identifier;
-  Node *Value;
-  Assign(std::string identifier, Node *value)
+  const Node &Value;
+  Assign(std::string identifier, const Node &value)
       : Identifier(identifier), Value(value) {}
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return Value; }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return true; }
 };
 
 struct IntLiteral : Node {
@@ -44,44 +44,44 @@ struct IntLiteral : Node {
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return true; }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return true; }
 };
 
 struct BinaryOperation : Node {
   Operators Op;
-  Node *LHS;
-  Node *RHS;
-  BinaryOperation(Operators op, Node *lhs, Node *rhs)
+  const Node &LHS;
+  const Node &RHS;
+  BinaryOperation(Operators op, const Node &lhs, const Node &rhs)
       : Op(op), LHS(lhs), RHS(rhs) {}
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return LHS && RHS; }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return true; }
 };
 
 struct If : Node {
-  BinaryOperation *BO;
-  Node *ThenPart;
-  Node *ElsePart;
-  If(BinaryOperation *bo, Node *ThenPart, Block *elsePart)
+  const BinaryOperation &BO;
+  const Node &ThenPart;
+  const Node &ElsePart;
+  If(const BinaryOperation &bo, const Node &ThenPart, const Block &elsePart)
       : BO(bo), ThenPart(ThenPart), ElsePart(elsePart) {}
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return BO && ThenPart && ElsePart; }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return true; }
 };
 
 struct Print : Node {
-  Node *Value;
-  Print(Node *value) : Value(value) {}
+  const Node &Value;
+  Print(const Node &value) : Value(value) {}
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return Value; }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return true; }
 };
 
 struct Fetch : Node {
@@ -90,8 +90,8 @@ struct Fetch : Node {
   void ToText(std::ostringstream &oss, StringMap &Dictionary,
               unsigned int &VariableCounter, unsigned int &ThenCounter,
               unsigned int &ElseCounter,
-              unsigned int &ContinueCounter) override;
-  bool IsValid() override { return Identifier.size(); }
+              unsigned int &ContinueCounter) const override;
+  bool IsValid() const override { return Identifier.size(); }
 };
 
 void DAG2Pilar(Block &DAG);
