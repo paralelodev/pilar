@@ -1,3 +1,6 @@
+/** pilarc.cpp                            **/
+/** Implementation for the Pilar frontend **/
+
 #include "pilar.h"
 #include <fstream>
 #include <iostream>
@@ -17,6 +20,8 @@ static bool isNumber(std::string_view Token) {
   return *p == 0;
 }
 
+// This is a VERY basic parser
+// TODO: improve!
 static Block *parseString(Program &P, std::string &Inst, Block *CurrentBlock) {
   std::istringstream StringStream(Inst);
   std::string Token, LastToken;
@@ -136,14 +141,16 @@ static Block *parseString(Program &P, std::string &Inst, Block *CurrentBlock) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    exitError("not enough arguments");
+  // Reject on invalid number of parameters
+  if (argc != 2) {
+    exitError("wrong number of arguments");
   }
 
   std::string Filename = argv[1];
   std::fstream PilarFile;
   PilarFile.open(Filename, std::ios::in);
 
+  // Reject on invalid file
   if (!PilarFile.is_open()) {
     exitError("could not open the file");
   }
@@ -152,13 +159,16 @@ int main(int argc, char *argv[]) {
 
   Block *CurrentBlock = nullptr;
 
+  // Parse the file line by line
   std::string Inst;
   while (getline(PilarFile, Inst)) {
+    // Skip on empty lines
     if (!Inst.empty()) {
       CurrentBlock = parseString(P, Inst, CurrentBlock);
     }
   }
-  PilarFile.close(); // close the file object.
+  PilarFile.close();
 
+  // Execute the parsed program
   runProgram(P);
 }

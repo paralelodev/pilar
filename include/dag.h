@@ -1,12 +1,18 @@
+/** dag.h                      **/
+/** Header for the DAG library **/
+
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace dag {
+// TODO: add here more commands for *, /, -, etc
 enum class Operators { ADD, EQUAL, GREATER };
 
 using StringMap = std::map<std::string, std::string>;
+
+// Here is the abstrat Node class
 
 struct Node {
   virtual void ToText(std::ostringstream &oss, StringMap &Dictionary,
@@ -15,6 +21,8 @@ struct Node {
                       unsigned int &ContinueCounter) const = 0;
   virtual bool IsValid() const = 0;
 };
+
+// And here its different flavors
 
 struct Block : Node {
   std::vector<Node *> Instructions;
@@ -94,6 +102,7 @@ struct Fetch : Node {
   bool IsValid() const override { return Identifier.size(); }
 };
 
+// This function converts the DAG into the Pilar syntax
 void DAG2Pilar(Block &DAG);
 
 } // namespace dag

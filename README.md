@@ -1,12 +1,20 @@
 # Pilar Language
 
 Pilar is a stack-based language for simple operations. 
+It supports scopes for each block of instructions: 
+symbols created at the block dissapear when the control moves to a block from of a previous scope.
+
+These sketches depict the overall idea (sorry for the non-artistic strokes :)):
+
+[Stack and Symbol Map](https://github.com/paralelodev/pilar/blob/main/doc/StackAndSymbols.jpg)
+
+[CFG and Symbol Map](https://github.com/paralelodev/pilar/blob/main/doc/CFGAndSymbols.jpg)
 
 ## Example
 
 This is a code sample in Pilar syntax:
 
-```
+```c
 .entry
 push 1
 store r0
@@ -51,18 +59,18 @@ It outputs:
 ```
 
 It corresponds to this DAG:
-```
+```c
 Block([Assign("a", IntLiteral(1)),
        Assign("b", IntLiteral(0)),
        If(BinaryOperation(Operators::EQUAL, Fetch("a"), Fetch("b")),
-           Print(IntLiteral(0)), Block({}));
+           Print(IntLiteral(0)), Block([]));
        If(BinaryOperation(Operators::GREATER, Fetch("a"), Fetch("b")),
            Print(IntLiteral(1)), Block([]));
        Print I4(BinaryOperation(Operators::ADD, Fetch("a"), Fetch("b")))])
 ```
 
 Which corresponds to this pseudocode:
-```
+```c
 a = 1
 b = 0
 if b == a {
@@ -76,24 +84,44 @@ print a + b
 
 ## Build Instructions
 
-```
+```bash
 cmake -G Ninja -B build .
 cd build
 ninja
 ```
 
+## Usage
+
+### Convert DAG to Pilar syntax
+```bash
+${PILAR_BUILD}/test/dag_002 > example_002.plr
+```
+[Click here to see the source code for dag_002.cpp](https://github.com/paralelodev/pilar/blob/main/test/dag_002.cpp)
+
+### Run a Pilar (.plr) file with the pilarc frontend
+```bash
+${PILAR_BUILD}/src/pilarc example_002.plr
+```
+
+### Build a Pilar program in memory (experimental)
+Programs can be built without the Pilar frontend by using directly the Pilar library:
+```bash
+${PILAR_BUILD}/test/test_002
+```
+[Click here to see the source code for test_002.cpp](https://github.com/paralelodev/pilar/blob/main/test/test_002.cpp)
+
 ## Test
 
-```
-<Pilar build folder>/test/dag_002 > example_002.plr
-diff example_002.plr <Pilar sources folder>/test/example_002.plr # no difference
-<Pilar build folder>/src/pilarc example_002.plr # outputs 5 and 9
-<Pilar build folder>/src/pilarc <Pilar sources folder>/test/example_002.plr  # outputs 5 and 9
-<Pilar build folder>test/test_002  # outputs 5 and 9
+```bash
+${PILAR_BUILD}/test/dag_002 > example_002.plr
+diff example_002.plr ${PILAR_SRC}/test/example_002.plr # no difference
+${PILAR_BUILD}/src/pilarc example_002.plr # outputs 5 and 9
+${PILAR_BUILD}/src/pilarc ${PILAR_SRC}/test/example_002.plr  # outputs 5 and 9
+${PILAR_BUILD}test/test_002  # outputs 5 and 9
 
-<Pilar build folder>/test/dag_003 > example_003.plr
-diff example_003.plr <Pilar sources folder>/test/example_003.plr # no difference
-<Pilar build folder>/src/pilarc example_003.plr # outputs 1 and 1
-<Pilar build folder>/src/pilarc <Pilar sources folder>/test/example_003.plr # outputs 1 and 1
-<Pilar build folder>/test/test_003 # outputs 1 and 1
+${PILAR_BUILD}/test/dag_003 > example_003.plr
+diff example_003.plr ${PILAR_SRC}/test/example_003.plr # no difference
+${PILAR_BUILD}/src/pilarc example_003.plr # outputs 1 and 1
+${PILAR_BUILD}/src/pilarc ${PILAR_SRC}/test/example_003.plr # outputs 1 and 1
+${PILAR_BUILD}/test/test_003 # outputs 1 and 1
 ```

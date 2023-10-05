@@ -1,3 +1,8 @@
+/** dag.cpp                            **/
+/** Implementation for the DAG library **/
+
+/** TODO: improve                      **/
+
 #include "dag.h"
 #include <iostream>
 
@@ -138,12 +143,16 @@ void DAG2Pilar(Block &DAG) {
   unsigned int ContinueCounter = 0;
   StringMap Dictionary;
   std::ostringstream PilarOutput;
+
   PilarOutput << ".entry" << '\n';
+  
   for (Node *node : DAG.Instructions) {
     node->ToText(PilarOutput, Dictionary, VariableCounter, ThenCounter,
                  ElseCounter, ContinueCounter);
   }
+  
   PilarOutput << "goto .exit" << '\n' << '\n' << ".exit" << '\n';
+  
   std::cout << PilarOutput.str();
 }
 } // namespace dag
